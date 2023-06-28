@@ -95,7 +95,7 @@ class follower(turtle):
         self.offset = offset
     def follow(self):
         target         = self.master.pos + self.offset - self.pos
-        self.pos.theta = math.atan2(target.y,target.x)
+        self.pos.theta = math.degrees(math.atan2(target.y,target.x))
         if target.dist() > 2:
             self.forward()
 
