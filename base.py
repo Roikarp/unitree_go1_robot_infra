@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import *
 import math
 import webcolors
+import copy
 
 def get_color(name):
     try:
@@ -12,7 +13,7 @@ def get_color(name):
         return None
 
 class position:
-    def __init__(self,x,y,v = 2,theta = 0,ang_v = 5):
+    def __init__(self,x,y,v = 2,ang_v = 5,theta = 0):
         self.x = x
         self.y = y
         self.v = v
@@ -38,7 +39,7 @@ class position:
 
 
 class visualizer:
-    def __init__(self,vis_name,color,width,trail_color,trail_width,window):
+    def __init__(self,vis_name,color,width,trail_color,trail_width,window,trail_len=400):
         self.vis_name = vis_name
         self.color = color
         self.width = width
@@ -46,11 +47,18 @@ class visualizer:
         self.trail_width = trail_width
         self.window   = window
         self.parent   = None
+        self.trail    = [] # List to store previous positions of the dot
+        self.trail_len = trail_len
+    def update_trail(self,pos):
+        self.trail.insert(0,pos)
+        if len(self.trail)>self.trail_len:
+            self.trail = self.trail[:self.trail_len]
+
     def draw(self):
         self.draw_trail()
         self.draw_shape()
     def draw_trail(self):
-        for pos in self.parent.trail:
+        for pos in self.trail:
             pygame.draw.circle(self.window, self.trail_color, (int(pos.x),int(pos.y)), self.trail_width)
     def draw_shape(self):
         if self.vis_name=='arrow':
@@ -74,7 +82,6 @@ class turtle:
         self.pos        = pos
         self.vis        = vis
         self.vis.parent = self
-        self.trail      = [] # List to store previous positions of the dot
     def right(self):
         self.pos.right()
     def left(self):
@@ -84,7 +91,7 @@ class turtle:
     def backwards(self):
         self.pos.backwards()
     def update_trail(self):
-        self.trail.append(self.pos)
+        self.vis.update_trail(copy.copy(self.pos))
     def draw(self):
         self.vis.draw()
 
@@ -120,16 +127,16 @@ TRAIL_RADIUS = 2
 TRAIL_COLOR = get_color('red')
 
 # Define movement speed and rotation angle
-MOVEMENT_SPEED = 2
-ROTATION_ANGLE = 5
+MOVEMENT_SPEED = 0.3
+ROTATION_ANGLE = 0.6
 
 # Define dot initial position, velocity, and orientation
-human_pos = position(WINDOW_WIDTH // 2,WINDOW_HEIGHT // 2,MOVEMENT_SPEED)
+human_pos = position(WINDOW_WIDTH // 2,WINDOW_HEIGHT // 2,MOVEMENT_SPEED,ROTATION_ANGLE)
 human_vis = visualizer('arrow',DOT_COLOR,DOT_RADIUS,TRAIL_COLOR,TRAIL_RADIUS,window)
 human = turtle(human_pos,human_vis)
 
 # Define folower initial position, velocity, and orientation
-robot_pos = position(WINDOW_WIDTH // 2,WINDOW_HEIGHT // 2,MOVEMENT_SPEED/2)
+robot_pos = position(WINDOW_WIDTH // 2,WINDOW_HEIGHT // 2,MOVEMENT_SPEED/2,ROTATION_ANGLE/2)
 robot_vis = visualizer('arrow',get_color('blue'),10,get_color('blue'),2,window)
 robot = follower(robot_pos,robot_vis,human)
 
