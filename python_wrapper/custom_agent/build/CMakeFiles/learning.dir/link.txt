@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -fPIC -rdynamic CMakeFiles/learning.dir/code/learning.cpp.o -o learning   -L/home/user_108/project_b/custom_agent/lib/cpp/amd64  -Wl,-rpath,/home/user_108/project_b/custom_agent/lib/cpp/amd64: -pthread -Wl,-Bstatic -lunitree_legged_sdk -Wl,-Bdynamic 
